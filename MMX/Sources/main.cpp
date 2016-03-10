@@ -2,6 +2,8 @@
 
 int main()
 {
+	static const short LOOP_TIME = 1000;
+
 	if (!InstructionSet::MMX())
 	{
 		cout << "Your CPU doesn't support MMX." << endl;
@@ -11,7 +13,7 @@ int main()
 	duration<double> time;
 
 	t1 = high_resolution_clock::now();
-	for (short i = 0; i < 1000; i++)
+	for (short i = 0; i < LOOP_TIME; i++)
 	{
 		addPlain();
 	}
@@ -21,7 +23,7 @@ int main()
 	cout << std::fixed << "Elapsed time: " << time.count() << "seconds" << endl;
 
 	t1 = high_resolution_clock::now();
-	for (short i = 0; i < 1000; i++)
+	for (short i = 0; i < LOOP_TIME; i++)
 	{
 		addMMX();
 	}
@@ -37,20 +39,21 @@ int main()
 
 void addPlain()
 {
-	int64_t x = 1024;
-	int64_t y = 1024;
-	int64_t result = x + y;
+	int x[2] = { 512, 1024 };
+	int y[2] = { 512, 1024 };
+	int result[2] = { x[0] + y[0], x[1] + y[1] };
 	//cout << "x: " << x << "\ty: " << y << endl;
 	//cout << "x + y = " << result << endl;
 }
 
 void addMMX()
 {
-	__m64 a = _m_from_int(1024);
-	__m64 b = _m_from_int(1024);
+	__m64 x = _mm_set_pi32(1024, 512);
+	__m64 y = _mm_set_pi32(1024, 512);
 
-	__m64 result_m64 = _mm_add_pi32(a, b);
+	__m64 result = _mm_add_pi32(x, y);
 	//cout << "a: " << _m_to_int(a) << "\tb: " << _m_to_int(b) << endl;
 	//cout << "a + b = " << _m_to_int(result_m64) << endl;
-	_mm_empty();
+	
+	_mm_empty(); // Should be essential when we've used MMX before.
 }
